@@ -5,6 +5,7 @@ use warnings;
 our $VERSION = '0.001000';
 $VERSION =~ tr/_//d;
 
+use if "$]" < 5.010, 'MRO::Compat';
 use mro qw(c3);
 use Pod::Simple;
 our @ISA = qw(Pod::Simple);
