@@ -107,3 +107,37 @@ sub match_section {
 }
 
 1;
+__END__
+
+=head1 NAME
+
+Pod::Simple::Filter::PodSelect - Pod::Select compatible API for Pod::Simple::Filter
+
+=head1 SYNOPSIS
+
+  use Pod::Simple::Filter::PodSelect;
+
+  podselect(@filelist);
+
+  podselect({-output => "tmp.out"}, @filelist);
+
+  podselect({-sections => ["NAME|SYNOPSIS", "OPTIONS"]}, @filelist):
+
+=head1 DESCRIPTION
+
+Provides and interface fully compatible with L<Pod::Select>, but using
+L<Pod::Simple::Filter> under the hood.
+
+=head1 SUPPORT
+
+See L<Pod::Simple::Filter> for support and contact information.
+
+=head1 AUTHORS
+
+See L<Pod::Simple::Filter> for authors.
+
+=head1 COPYRIGHT AND LICENSE
+
+See L<Pod::Simple::Filter> for the copyright and license.
+
+=cut

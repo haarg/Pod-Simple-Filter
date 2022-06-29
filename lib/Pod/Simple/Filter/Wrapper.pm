@@ -264,16 +264,30 @@ __END__
 
 =head1 NAME
 
-Pod::Simple::Filter::Mixin - Parent class for filtering Pod documents
+Pod::Simple::Filter::Wrapper - Parent class for filtering Pod documents
 
 =head1 SYNOPSIS
 
-  package Pod::Simple::MyFormat::Filter;
-  use mro qw(c3);
-  use parent qw(Pod::Simple::Filter::Mixin Pod::Simple::MyFormat);
+  package Pod::Simple::Filter::XHTML;
+  use parent qw(Pod::Simple::XHTML);
+  use Pod::Simple::Filter::Wrapper;
+  Pod::Simple::Filter::Wrapper::wrap(__PACKAGE__);
 
 =head1 DESCRIPTION
 
-...
+Can be used to add filtering to an arbitrary L<Pod::Simple> subclass. Operates
+similar to a role, but without any prerequisites.
+
+=head1 SUPPORT
+
+See L<Pod::Simple::Filter> for support and contact information.
+
+=head1 AUTHORS
+
+See L<Pod::Simple::Filter> for authors.
+
+=head1 COPYRIGHT AND LICENSE
+
+See L<Pod::Simple::Filter> for the copyright and license.
 
 =cut

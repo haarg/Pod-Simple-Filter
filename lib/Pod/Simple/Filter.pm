@@ -32,7 +32,7 @@ Pod::Simple::Filter - Filter Pod documents compatibly with Pod::Select
 
 =head1 DESCRIPTION
 
-Filters Pod documents, outputting the 
+Filters Pod documents.
 
 =head1 FILTERS
 
@@ -42,11 +42,17 @@ L<Pod::Select>.
 
 =head1 METHODS
 
-=head2 set_filters
+=head2 include_sections
 
-=head2 add_filters
+=head2 set_include_sections
 
-=head2 clear_filters
+=head2 add_include_sections
+
+=head2 clear_include_sections
+
+=head2 match_headings
+
+=head2 compile_heading_spec
 
 =head1 AUTHOR
 
