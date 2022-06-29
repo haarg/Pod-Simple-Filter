@@ -1,13 +1,20 @@
 use strict;
 use warnings;
 
-use Test::More "$]" >= 5.010 ? () : (skip_all => 'Requires perl 5.10 or newer');
+use Test::More;
+
+BEGIN {
+  if ("$]" < 5.010) {
+    eval { require MRO::Compat }
+      or plan skip_all => 'Requires perl 5.10 or newer, or MRO::Compat';
+  }
+}
 
 {
   package Pod::Simple::Filter::XHTML;
-  use mro 'c3';
   use Pod::Simple::Filter::C3;
   use Pod::Simple::XHTML;
+  use mro 'c3';
   our @ISA = qw(Pod::Simple::Filter::C3 Pod::Simple::XHTML);
 }
 
