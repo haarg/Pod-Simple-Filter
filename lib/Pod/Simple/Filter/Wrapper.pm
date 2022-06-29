@@ -5,6 +5,8 @@ use warnings;
 our $VERSION = '0.001000';
 $VERSION =~ tr/_//d;
 
+use Carp qw(croak);
+
 my $STATE_KEY = 'Pod::Simple::Filter';
 
 my %skip_compose;
@@ -14,19 +16,33 @@ sub wrap {
   my $class = shift;
   my ($wrap_package) = @_;
   no strict 'refs';
+  my %install;
   for my $method (sort grep !/::\z/ && defined &$_, keys %{__PACKAGE__.'::'}) {
     next
       if exists $skip_compose{$method};
     my $install_method = $method;
     my $to_install = \&$method;
+    my $overwrite_ok;
     if ($install_method =~ s/\A_wrap_//) {
+      $overwrite_ok = 1;
       my $to_wrap = $wrap_package->can($install_method)
         or die "$install_method not available in $wrap_package!";
       $to_install = $to_install->($to_wrap);
     }
-    no warnings 'redefine';
-    *{$wrap_package.'::'.$install_method} = $to_install;
+
+    my $fq_install = $wrap_package.'::'.$install_method;
+    if (defined &$fq_install && !$overwrite_ok) {
+      croak "Unable to install $install_method in $wrap_package, method already exists!";
+    }
+
+    $install{$fq_install} = $to_install;
   }
+
+  for my $fq_install (sort keys %install) {
+    no warnings 'redefine';
+    *$fq_install = $install{$fq_install};
+  }
+
   return;
 }
 
@@ -254,7 +270,7 @@ sub compile_heading_spec {
       push @bad, qq{Bad regular expression /$part/ in "$spec": $@\n};
     };
   }
-  die join '', @bad
+  croak join '', @bad
     if @bad;
   return \@parts;
 }
