@@ -1,0 +1,45 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use lib 'lib';
+use Pod::Select ();
+use Pod::Simple::Filter::PodSelect ();
+use Text::Diff ();
+
+my $file = shift or die "no files!";
+my @sections = @ARGV;
+
+my $pod = do {
+  open my $fh, '<', $file
+    or die "unable to open '$file': $!";
+  local $/;
+  <$fh>;
+};
+
+sub process {
+  my $sub = shift;
+
+  open my $in_fh, '<', \$pod;
+  my $out = '';
+  open my $out_fh, '>', \$out;
+
+  $sub->({ -output => $out_fh, -sections => \@sections }, $in_fh);
+
+  $out =~ s{\A=pod\n\n}{};
+  $out =~ s{\n=cut\n\z}{};
+  $out =~ s{\n*\z}{\n};
+
+  return $out;
+}
+
+
+my $podselect = process(\&Pod::Select::podselect);
+my $podsimpleselect = process(\&Pod::Simple::Filter::PodSelect::podselect);
+
+my $diff = Text::Diff::diff(
+  \$podselect,
+  \$podsimpleselect,
+  { STYLE => 'Unified' },
+);
+
+print $diff;

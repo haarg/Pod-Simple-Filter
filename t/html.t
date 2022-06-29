@@ -1,14 +1,23 @@
 use strict;
 use warnings;
-use Test::More;
-use Pod::Simple::Filter;
 
+use Test::More "$]" >= 5.010 ? () : (skip_all => 'Requires perl 5.10 or newer');
+
+{
+  package Pod::Simple::Filter::XHTML;
+  use mro 'c3';
+  use Pod::Simple::Filter::C3;
+  use Pod::Simple::XHTML;
+  our @ISA = qw(Pod::Simple::Filter::C3 Pod::Simple::XHTML);
+}
 
 sub convert {
   my ($pod, $select) = @_;
 
   my $out = '';
-  my $parser = Pod::Simple::Filter->new;
+  my $parser = Pod::Simple::Filter::XHTML->new;
+  $parser->html_header('');
+  $parser->html_footer('');
   $parser->output_string(\$out);
   $parser->set_include_sections(@$select);
 
@@ -25,12 +34,11 @@ sub compare {
     }
   }
   my $got = convert($in, $select);
-  $got =~ s/\A=pod\n\n//;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   is $got, $want, $name;
 }
 
-compare <<'END_IN_POD', <<'END_OUT_POD', [ 'DESCRIPTION/guff' ];
+compare <<'END_POD', <<'END_HTML', [ 'DESCRIPTION/guff' ];
   =head1 NAME
 
   NAME content
@@ -52,12 +60,11 @@ compare <<'END_IN_POD', <<'END_OUT_POD', [ 'DESCRIPTION/guff' ];
   guff content
 
   =cut
-END_IN_POD
-  =head2 guff
+END_POD
+  <h2 id="guff">guff</h2>
 
-  guff content
+  <p>guff content</p>
 
-  =cut
-END_OUT_POD
+END_HTML
 
 done_testing;

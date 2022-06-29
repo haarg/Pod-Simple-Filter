@@ -1,16 +1,19 @@
-package Pod::Simple::Select::PodSelect;
+package Pod::Simple::Filter::PodSelect;
 use strict;
 use warnings;
-use Pod::Simple::Select;
-use Exporter;
-*import = \&Exporter::import;
-our @ISA = qw(Pod::Simple::Select);
 
-our @EXPORT_OK = qw(podselect);
+our $VERSION = '0.001000';
+$VERSION =~ tr/_//d;
+
+use Pod::Simple::Filter;
+our @ISA = qw(Pod::Simple::Filter);
+
+use Exporter; BEGIN { *import = \&Exporter::import }
+our @EXPORT = qw(podselect);
 
 sub podselect {
   my (@files) = @_;
-  my $parser = Pod::Simple::Select->new;
+  my $parser = __PACKAGE__->new;
   my $output;
   my %opts;
   for my $file (@files) {
@@ -24,7 +27,7 @@ sub podselect {
 
       $output = $opts{output}
         if exists $opts{output};
-      $parser->selection(@{ $opts{sections} })
+      $parser->select(@{ $opts{sections} })
         if exists $opts{sections};
       next;
     }
@@ -34,9 +37,8 @@ sub podselect {
 
 sub curr_headings {
   my $self = shift;
-  my $me = $self->{+__PACKAGE__} || return undef;
-  my $sections = $me->{section};
-  return @_ ? $sections->[$_[0]] : @$sections;
+  my $headings = $self->_current_headings;
+  return @_ ? $headings->[$_[0]] : @$headings;
 }
 
 sub select {
@@ -47,12 +49,12 @@ sub select {
     shift @specs;
   }
   else {
-    $self->selection;
+    $self->clear_include_sections;
   }
 
   for my $spec (@specs) {
     eval {
-      $self->add_selection($spec);
+      $self->add_include_sections($spec);
       1;
     } or do {
       warn $@;
@@ -61,16 +63,22 @@ sub select {
   }
 }
 
-sub clear_selections {
+sub add_selection {
   my $self = shift;
-  $self->selection;
+  $self->add_include_sections(@_);
 }
 
+sub clear_selections {
+  my $self = shift;
+  $self->clear_include_sections;
+}
+
+# i dunno what this is, but provided for compatibility
 sub is_selected {
   my $self = shift;
   my ($paragraph) = @_;
 
-  my @sections = $self->curr_headings;
+  my @headings = $self->curr_headings;
 
   if ($paragraph =~ /^=((?:sub)*)(?:head(?:ing)?|sec(?:tion)?)(\d*)\s+(.*?)\s*$/) {
     my $sub = length($1) / 3;
@@ -80,12 +88,22 @@ sub is_selected {
     $level = 1 + $sub
       if $sub;
 
-    splice @sections, $level - 1;
+    splice @headings, $level - 1;
 
-    $sections[$level - 1] = $heading;
+    $headings[$level - 1] = $heading;
   }
 
-  $self->match_selection(@sections);
+  $self->match_headings(@headings);
+}
+
+sub match_section {
+  my $self = shift;
+  my @headings = @_;
+
+  if (!@headings) {
+    @headings = $self->curr_headings;
+  }
+  $self->match_headings(@headings);
 }
 
 1;

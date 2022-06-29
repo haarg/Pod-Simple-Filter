@@ -3,7 +3,7 @@ use warnings FATAL => 'all';
 use 5.006;
 
 my %META = (
-  name => 'Pod-Simple-Select',
+  name => 'Pod-Simple-Filter',
   license => 'perl_5',
   prereqs => {
     configure => { requires => {
@@ -18,6 +18,8 @@ my %META = (
     },
     runtime => {
       requires => {
+        'Pod::Simple' => 0,
+        'Pod::Simple::JustPod' => 0,
       },
     },
     develop   => {
@@ -27,13 +29,13 @@ my %META = (
   },
   resources => {
     repository => {
-      url => 'https://github.com/haarg/Pod-Simple-Select.git',
-      web => 'https://github.com/haarg/Pod-Simple-Select',
+      url => 'https://github.com/haarg/Pod-Simple-Filter.git',
+      web => 'https://github.com/haarg/Pod-Simple-Filter',
       type => 'git',
     },
     bugtracker => {
-      web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Simple-Select',
-      mailto => 'bug-Pod-Simple-Select@rt.cpan.org',
+      web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Simple-Filter',
+      mailto => 'bug-Pod-Simple-Filter@rt.cpan.org',
     },
     license => [ 'http://dev.perl.org/licenses/' ],
   },
